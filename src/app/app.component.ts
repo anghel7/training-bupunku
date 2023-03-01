@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SpecieService } from './modules/species/services/specie.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'ejercicios';
+
+  constructor(private specieService:SpecieService){
+    this.specieService.init();
+  }
 }
