@@ -2,11 +2,24 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Page } from '../models/page';
 import { Specie } from '../models/specie';
-import { Observable, takeWhile, expand, of, BehaviorSubject } from 'rxjs';
+import { Homeworld } from '../models/homeworld';
+import { Observable, takeWhile, expand, of, BehaviorSubject, map, reduce, tap, EMPTY, mergeMap, concatMap, filter, from, toArray, concatAll, take } from 'rxjs';
 
 
 
-const BASE_URL = 'https://swapi.dev/api/species/';
+const SPECIES_URL = 'https://swapi.dev/api/species/';
+const BASE_URL = 'https://swapi.dev/api/';
+const HINT = 'species';
+
+/**
+  takeUntil,
+  concatMap
+  mermeMap
+  SwitchMap
+  exhautMap
+
+*/
+
 
 @Injectable({
   providedIn: 'root'
@@ -21,11 +34,61 @@ export class SpecieService {
 
   $speciesFavoriteListSubject = new BehaviorSubject<Specie[]>([]);
 
+  $speciesBehaviorSubject = new BehaviorSubject<Specie[]>([]);
+
   constructor(private http: HttpClient) { }
+
+  getSpecies(): Observable<Array<Specie>> {
+    return this.http.get<Page<Specie>>(`${BASE_URL}${HINT}/`)
+      .pipe(
+        expand(pageSpecie => pageSpecie.next ? this.http.get<Page<Specie>>(pageSpecie.next) : EMPTY),
+        take(1), // remove only for test
+        map(pageSpecie => pageSpecie.results),
+        concatAll(),
+        take(4) // remove only for test
+      ).
+      pipe(
+        mergeMap(specie => {
+          if (specie.homeworld == null) {
+            return of(specie);
+          }
+          return this.http.get<Homeworld>(specie.homeworld).pipe(
+            map(resultHomeworld => {
+              return {
+                ...specie,
+                homeworld: resultHomeworld.name
+              };
+            })
+          );
+        }),
+        toArray()
+      );
+  }
+
+  getSpeciesFavorites(): Observable<Specie[]> {
+    if (!localStorage.getItem('favorites')) {
+      return of(new Array<Specie>());
+    } else {
+      const data = localStorage.getItem('favorites') as string;
+      const list = JSON.parse(data) as Specie[];
+      return of(list);
+    }
+  }
+
+  initObservableMode():void{
+    const data = localStorage.getItem('favorites') as string;
+    if (!data) {
+      localStorage.setItem('favorites', JSON.stringify([]));
+    }
+    this.getSpecies()
+    .subscribe(speciesList => {
+      this.$speciesBehaviorSubject.next(speciesList)
+    });
+  }
 
   getPagitnated(pageNumber?: number): Observable<Page<Specie>> {
     const page = pageNumber ? `?page=${pageNumber}` : '';
-    return this.http.get<Page<Specie>>(`${BASE_URL}${page}`);
+    return this.http.get<Page<Specie>>(`${SPECIES_URL}${page}`);
   }
 
   getAll(): Observable<any> {

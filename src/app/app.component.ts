@@ -10,6 +10,7 @@ export class AppComponent {
   title = 'ejercicios';
 
   constructor(private specieService:SpecieService){
-    this.specieService.init();
+    // this.specieService.init();
+    this.specieService.initObservableMode();
   }
 }
