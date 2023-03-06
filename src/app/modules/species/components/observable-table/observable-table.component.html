@@ -28,7 +28,7 @@
 
   </tr>
 
-  <ng-container *ngIf="(speciesDataSource$ | async) as data">
+  <ng-container *ngIf="speciesList as data">
     <tr *ngFor="let specie of data; let index=index">
 
       <td>{{ specie.name }}</td>

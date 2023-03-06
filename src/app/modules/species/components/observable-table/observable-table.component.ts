@@ -11,13 +11,14 @@ import { SpecieService } from '../../services/specie.service';
 })
 export class ObservableTableComponent implements OnInit {
 
+  speciesList: Specie[] = [];
 
   constructor(private specieService: SpecieService,
     private router: Router) {
 
   }
 
-  speciesDataSource$ = this.specieService.$speciesBehaviorSubject.pipe(
+  speciesDataSource$ = of(new Array<Specie>).pipe(
     map(specieList => {
       const data = localStorage.getItem('favorites') as string;
       const listFavorite = JSON.parse(data) as Specie[];
@@ -33,7 +34,13 @@ export class ObservableTableComponent implements OnInit {
     })
   );
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.specieService.getSpecies2()
+    .subscribe(specie=>{
+      this.speciesList.push(specie);
+    });
+    
+  }
 
   addFavortes(specie: Specie, specieList: Specie[], index: number): void {
     if (!localStorage.getItem('favorites')) {

@@ -38,6 +38,30 @@ export class SpecieService {
 
   constructor(private http: HttpClient) { }
 
+  getSpecies2(): Observable<Specie> {
+    return this.http.get<Page<Specie>>(`${BASE_URL}${HINT}/`)
+      .pipe(
+        expand(pageSpecie => pageSpecie.next ? this.http.get<Page<Specie>>(pageSpecie.next) : EMPTY),
+        // take(1), // remove only for test
+        map(pageSpecie => pageSpecie.results),
+        concatAll(),
+        // take(4) // remove only for test
+        mergeMap(specie => {
+          if (specie.homeworld == null) {
+            return of(specie);
+          }
+          return this.http.get<Homeworld>(specie.homeworld).pipe(
+            map(resultHomeworld => {
+              return {
+                ...specie,
+                homeworld: resultHomeworld.name
+              };
+            })
+          );
+        }),
+      )
+  }
+
   getSpecies(): Observable<Array<Specie>> {
     return this.http.get<Page<Specie>>(`${BASE_URL}${HINT}/`)
       .pipe(
@@ -75,15 +99,15 @@ export class SpecieService {
     }
   }
 
-  initObservableMode():void{
+  initObservableMode(): void {
     const data = localStorage.getItem('favorites') as string;
     if (!data) {
       localStorage.setItem('favorites', JSON.stringify([]));
     }
     this.getSpecies()
-    .subscribe(speciesList => {
-      this.$speciesBehaviorSubject.next(speciesList)
-    });
+      .subscribe(speciesList => {
+        this.$speciesBehaviorSubject.next(speciesList)
+      });
   }
 
   getPagitnated(pageNumber?: number): Observable<Page<Specie>> {
