@@ -13,6 +13,8 @@ export class ObservableTableComponent implements OnInit {
 
   speciesList: Specie[] = [];
 
+  total: number = 37;
+
   constructor(private specieService: SpecieService,
     private router: Router) {
 
@@ -36,10 +38,11 @@ export class ObservableTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.specieService.getSpecies2()
-    .subscribe(specie=>{
-      this.speciesList.push(specie);
-    });
-    
+      .subscribe(data => {
+        this.speciesList.push(data[0]);
+        this.total = data[1];
+      });
+
   }
 
   addFavortes(specie: Specie, specieList: Specie[], index: number): void {

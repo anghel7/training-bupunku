@@ -38,11 +38,15 @@ export class SpecieService {
 
   constructor(private http: HttpClient) { }
 
-  getSpecies2(): Observable<Specie> {
+  getSpecies2(): Observable<[Specie, number]> {
+    let total:number = 0;
     return this.http.get<Page<Specie>>(`${BASE_URL}${HINT}/`)
       .pipe(
         expand(pageSpecie => pageSpecie.next ? this.http.get<Page<Specie>>(pageSpecie.next) : EMPTY),
-        // take(1), // remove only for test
+        tap(result => {
+          total = result.count;
+        }),
+        // take(3), // remove only for test
         map(pageSpecie => pageSpecie.results),
         concatAll(),
         // take(4) // remove only for test
@@ -59,6 +63,7 @@ export class SpecieService {
             })
           );
         }),
+        map(data => [data, total])
       )
   }
 

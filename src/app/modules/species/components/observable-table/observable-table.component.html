@@ -1,6 +1,11 @@
 <h2>Especies</h2>
 
 <button [routerLink]="'/species/observable-favorites'" type="button">Ver favoritos</button>
+<br>
+<div>
+  <p>Progreso: {{ speciesList.length }} de {{ total }}</p>
+  <progress [value]="speciesList.length" [max]="total">70 %</progress>
+</div>
 
 <table>
 
