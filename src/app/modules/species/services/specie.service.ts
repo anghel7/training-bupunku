@@ -36,7 +36,23 @@ export class SpecieService {
 
   $speciesBehaviorSubject = new BehaviorSubject<Specie[]>([]);
 
+  private $speciesListBehaviorSubject = new BehaviorSubject<[Specie[], number]>([[],0]);
+  private list:Specie[] = [];
+
+
   constructor(private http: HttpClient) { }
+
+  getSpeciesListObservable():Observable<[Specie[], number]>{
+    return this.$speciesListBehaviorSubject.asObservable();
+  }
+
+  initSecondObservable():void{
+    this.getSpecies2()
+    .subscribe(data => {
+      this.list.push(data[0]);
+      this.$speciesListBehaviorSubject.next([this.list, data[1]]);
+    });
+  }
 
   getSpecies2(): Observable<[Specie, number]> {
     let total:number = 0;

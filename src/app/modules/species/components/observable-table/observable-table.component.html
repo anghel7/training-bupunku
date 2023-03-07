@@ -2,39 +2,38 @@
 
 <button [routerLink]="'/species/observable-favorites'" type="button">Ver favoritos</button>
 <br>
-<div>
-  <p>Progreso: {{ speciesList.length }} de {{ total }}</p>
-  <progress [value]="speciesList.length" [max]="total">70 %</progress>
-</div>
+<ng-container *ngIf="secondDataSource$ | async as data">
+  <div>
+    <p>Progreso: {{ data[0].length }} de {{ data[1] }}</p>
+    <progress [value]="data[0].length" [max]="data[1]">70 %</progress>
+  </div>
+  <table>
 
-<table>
+    <tr>
 
-  <tr>
+      <th>Name</th>
 
-    <th>Name</th>
+      <th>Classification</th>
 
-    <th>Classification</th>
+      <th>Designation</th>
 
-    <th>Designation</th>
+      <th>Average Height</th>
 
-    <th>Average Height</th>
+      <th>Skin colors</th>
 
-    <th>Skin colors</th>
+      <th>Hair colors</th>
 
-    <th>Hair colors</th>
+      <th>Eye colors</th>
 
-    <th>Eye colors</th>
+      <th>Average LifeSpan</th>
 
-    <th>Average LifeSpan</th>
+      <th>Homeworld</th>
 
-    <th>Homeworld</th>
+      <th>Homeworld</th>
 
-    <th>Homeworld</th>
+    </tr>
 
-  </tr>
-
-  <ng-container *ngIf="speciesList as data">
-    <tr *ngFor="let specie of data; let index=index">
+    <tr *ngFor="let specie of data[0]; let index=index">
 
       <td>{{ specie.name }}</td>
 
@@ -55,12 +54,9 @@
       <td>{{ specie.homeworld }}</td>
 
       <td>
-        <button (click)="addFavortes(specie, data, index)" type="button">Agregar Favoritos</button>
+        <button (click)="addFavortes(specie, data[0], index)" type="button">Agregar Favoritos</button>
       </td>
 
     </tr>
-
-  </ng-container>
-
-
-</table>
+  </table>
+</ng-container>

@@ -12,5 +12,6 @@ export class AppComponent {
   constructor(private specieService:SpecieService){
     // this.specieService.init();
     // this.specieService.initObservableMode();
+    this.specieService.initSecondObservable();
   }
 }
